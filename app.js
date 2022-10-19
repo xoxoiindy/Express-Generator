@@ -1,9 +1,7 @@
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
-//const cookieParser = require('cookie-parser');
-//const session = require('express-session');
-//const FileStore = require('session-file-store')(session);
+
 const logger = require('morgan');
 const passport = require('passport');
 const config = require('./config');
@@ -29,6 +27,15 @@ connect.then(() => console.log('Connected correctly to server'),
 );
 
 const app = express();
+
+app.all('*', (req,res,next) => {
+  if (req.secure) {
+    return next();
+  } else {
+    console.log(`Redirecting to: https://${req.hostname}:${app.get('secPort')}${req.url}`);
+    res.redirect(301, `https://${req.hostname}:${app.get('secPort')}${req.url}`);
+  }
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
